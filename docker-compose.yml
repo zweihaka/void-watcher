@@ -1,5 +1,26 @@
 services:
     app:
-        build: .
+        build: ./app
+        depends_on:
+            - db
         ports:
             - "8000:8000"
+        env_file: .env
+        environment:
+            DB_HOST: db
+            DB_USER: ${DB_USER}
+            DB_PASS: ${DB_PASS}
+            DB_NAME: ${DB_NAME}
+        restart: unless-stopped
+
+    db:
+        image: postgres:15-alpine
+        env_file: .env
+        environment:
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASS}
+            POSTGRES_DB: ${DB_NAME}
+        volumes:
+            - ./db/data:/var/lib/postgresql/data
+            - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+        restart: unless-stopped

@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS observations (
+    id SERIAL PRIMARY KEY,
+    data text,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
