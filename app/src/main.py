@@ -1,9 +1,14 @@
 import os
+import logging
 from fastapi import FastAPI
+from .database import engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 from pydantic import BaseModel
 from datetime import datetime
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -21,7 +26,7 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 
 class StatusResponse(BaseModel):
     status: str
-    timestamp: str
+    database: str
     node: str
 
 @app.get("/", response_model=StatusResponse)
@@ -36,7 +41,7 @@ async def home():
 
     return {
     "status": "Welcome home",
-    "timestamp": datetime.now().isoformat(),
+    "database": db_status,
     "node": "Debian-Production"
 }
 
@@ -48,10 +53,11 @@ async def get_status():
             result = await conn.execute(text("SELECT 1"))
             db_status = "Connected"
     except Exception as e:
+        logger.error(f"Database connection failed: {e}")
         db_status = f"Error: {str(e)}"
 
     return {
     "status": "Void-Watcher online",
-    "timestamp": datetime.now().isoformat(),
+    "database": db_status,
     "node": "Debian-Production"
 }
