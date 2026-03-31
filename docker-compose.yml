@@ -1,18 +1,4 @@
 services:
-    app:
-        build: ./app
-        depends_on:
-            - db
-        ports:
-            - "8000:8000"
-        env_file: .env
-        environment:
-            DB_HOST: db
-            DB_USER: ${DB_USER}
-            DB_PASS: ${DB_PASS}
-            DB_NAME: ${DB_NAME}
-        restart: unless-stopped
-
     db:
         image: postgres:15-alpine
         env_file: .env
@@ -23,4 +9,35 @@ services:
         volumes:
             - ./db/data:/var/lib/postgresql/data
             - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+    app:
+        build: ./app
+        depends_on:
+            db:
+                condition: service_healthy
+        ports:
+            - "8000:8000"
+        env_file: .env
+        environment:
+            DB_HOST: db
+            DB_USER: ${DB_USER}
+            DB_PASS: ${DB_PASS}
+            DB_NAME: ${DB_NAME}
         restart: unless-stopped
+
+    worker:
+        build: ./app
+        command: ["python", "-m", "src.worker"]
+        depends_on:
+            db:
+                condition: service_healthy
+        env_file: .env
+        environment:
+            DB_HOST: db
+            DB_USER: ${DB_USER}
+            DB_PASS: ${DB_PASS}
+            DB_NAME: ${DB_NAME}
