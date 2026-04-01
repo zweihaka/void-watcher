@@ -14,9 +14,8 @@ async def get_last_mass():
         )
         row = result.fetchone()
         if row:
-                match = re.search(r"(\d+\.\d+)", row[0])
-                if match:
-                        return float(match.group(1))
+            return float(row[0])
+
         return init_mass
 
 async def run_worker():
@@ -27,14 +26,14 @@ async def run_worker():
 
     while True:
             try:
+                mass = await get_last_mass()
                 mass += random.uniform(0.00000000001, 0.00000000009) # Accreation
                 mass -= random.uniform(0.000000000001,0.0000000000001) # Hawking radiation
                 mass = round(mass, 18)
-                data = f"Mass is now {mass:.18f} solar masses"
                 async with engine.begin() as conn:
                     await conn.execute(
                             text("INSERT INTO observations (mass) VALUES (:mass_value)"),
-                            {"mass_value": data}
+                            {"mass_value": mass}
                     )
                 print(f"Recorded: {data}")
             except Exception as e:

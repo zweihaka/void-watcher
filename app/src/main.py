@@ -1,20 +1,28 @@
-from fastapi import FastAPI
-from .database import engine
+from fastapi import FastAPI, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from .database import engine, AsyncSessionLocal
 from sqlalchemy import text
+from . import crud
 
 app = FastAPI()
 
-@app.get("/api/status")
-async def get_status():
-    try:
-        # Database ping
-        async with engine.connect() as conn:
-            await conn.execute(text("SELECT 1"))
-            db_status = "Connected"
-    except Exception as e:
-        db_status = f"Error: {e}"
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
 
-    return {
-        "status": "Void-Watcher online",
-        "database": db_status
-    }
+@app.get("/api/status")
+async def get_status(db: AsyncSession = Depends(get_db)):
+    status = await crud.ping_db(db)
+    return {"status": "Online", "db": status}
+
+
+@app.get("/api/history")
+async def get_history(db: AsyncSession = Depends(get_db)):
+    mass = await crud.get_history(db)
+    return {"mass_value": mass}
+
+@app.post("/api/reset")
+async def reset_data(db: AsyncSession = Depends(get_db)):
+    await crud.reset_mass(db)
+
+    return {"status": "Database reseted to singularity"}

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS observations (
     id SERIAL PRIMARY KEY,
-    mass text,
+    mass DOUBLE PRECISION,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
