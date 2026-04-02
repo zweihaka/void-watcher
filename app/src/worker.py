@@ -35,7 +35,7 @@ async def run_worker():
                             text("INSERT INTO observations (mass) VALUES (:mass_value)"),
                             {"mass_value": mass}
                     )
-                print(f"Recorded: {data}")
+                print(f"Recorded: {mass}")
             except Exception as e:
                 print(f"Worker Error: {e}")
 

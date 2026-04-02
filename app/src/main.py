@@ -1,10 +1,14 @@
-from fastapi import FastAPI, Depends
+import time
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from .database import engine, AsyncSessionLocal
 from sqlalchemy import text
 from . import crud
 
 app = FastAPI()
+
+last_reset_time = 0
+COOLDOWN = 60
 
 async def get_db():
     async with AsyncSessionLocal() as session:
@@ -23,6 +27,12 @@ async def get_history(db: AsyncSession = Depends(get_db)):
 
 @app.post("/api/reset")
 async def reset_data(db: AsyncSession = Depends(get_db)):
+    global last_reset_time
+    now = time.time()
+    if now - last_reset_time < COOLDOWN:
+        raise HTTPException(status_code=429, detail ="Too soon, wait before next reset.")
+    last_reset_time = now
+
     await crud.reset_mass(db)
 
     return {"status": "Database reseted to singularity"}

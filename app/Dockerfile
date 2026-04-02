@@ -4,7 +4,7 @@ FROM base AS builder
 
 WORKDIR /app
 
-#Copying only requirements - the layer will be cached till the file changes
+# Copying only requirements - the layer will be cached till the file changes
 COPY requirements.txt .
 
 RUN pip install --no-cache-dir --upgrade pip && \

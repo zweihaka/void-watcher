@@ -22,15 +22,20 @@ function App() {
     }
   };
 
+const [cooldown, setCooldown] = useState(0); // Remaining cooldown time
+const COOLDOWN_SECONDS = 60;
+
   const handleReset = async () => {
     if (!window.confirm('Reset database? This action cannot be undone.')) return;
     setResetting(true);
     setResetStatus(null);
+
     try {
       await axios.post('/api/reset');
       setData([]);
       setStatus("SEARCHING...");
       setResetStatus('ok');
+      setCooldown(COOLDOWN_SECONDS);
     } catch (err) {
       setResetStatus('error');
     } finally {
@@ -44,6 +49,24 @@ function App() {
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+
+    const timer = setInterval(() => {
+        setCooldown(prev =>{
+            if (prev <= 1){
+                clearInterval(timer);
+                return 0;
+            }
+            return prev - 1;
+        });
+
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldown]);
+
 
   return (
     <div className="void-bg">
@@ -81,9 +104,21 @@ function App() {
             <button
               className={`reset-btn ${resetting ? 'reset-btn--loading' : ''}`}
               onClick={handleReset}
-              disabled={resetting}
+              disabled={resetting || cooldown > 0}
             >
-              {resetting ? 'RESETTING...' : '⬡ INITIATE SINGULARITY RESET'}
+                <motion.span
+                    key ={cooldown}
+                    initial ={{ opacity: 0.5 }}
+                    animate ={{ opacity: 1 }}
+                    exit ={{ opacity: 0.5 }}
+                    transition ={{ duration: 0.3 }}
+                >
+                {resetting 
+                    ? 'RESETTING...'
+                    : cooldown > 0
+                        ? `WAIT ${cooldown}s `
+                        :'⬡ INITIATE SINGULARITY RESET'}
+                </motion.span>
             </button>
             <AnimatePresence>
               {resetStatus && (
@@ -93,7 +128,7 @@ function App() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                 >
-                  {resetStatus === 'ok' ? 'DATABASE WIPED.' : 'RESET FAILED.'}
+                  {resetStatus === 'ok' ? 'Database has collapsed into a singularity.' : 'RESET FAILED.'}
                 </motion.span>
               )}
             </AnimatePresence>
