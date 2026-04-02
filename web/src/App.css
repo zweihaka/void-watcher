@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Share+Tech+Mono&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.void-bg {
+  background-color: #000;
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)), url('https://www.icegif.com/wp-content/uploads/2024/03/black-hole-icegif-5.gif');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #d4d4d4; /* Серебристый текст */
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.void-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.void-title {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 4.5rem;
+  color: #ffffff;
+  text-shadow: 
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    6px 6px 0 rgba(0, 0, 0, 0.8);
+
+  letter-spacing: 15px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  backgroup: linear-gradient(to bottom, #ffffff 40%, #888888 100%);
+  -webkit-background-clip: text;
+}
+
+.glass-panel {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  color: #a0a0a0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pulse {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.pulse.connected {
+  background: #00ff41;
+  box-shadow: 0 0 10px #00ff41;
+  animation: pulse-green 2s infinite;
+}
+
+.pulse.error {
+  background: #ff003c;
+  box-shadow: 0 0 10px #ff003c;
+  animation: pulse-red 1s infinite;
+}
+
+@keyframes pulse-green {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 60, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(255, 0, 60, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 60, 0); }
+}
+
+.log-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.log-item {
+  background: rgba(20, 20, 20, 0.8);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.log-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3); /* Белый акцент при наведении */
+  transform: scale(1.02);
+}
+
+.log-id {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.log-mass {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.reset-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 0, 60, 0.2);
+}
+
+.reset-btn {
+  background: transparent;
+  border: 1px solid #ff003c;
+  color: #ff003c;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.reset-btn:hover {
+  background: #ff003c;
+  color: #000;
+}
+
+.reset-btn--loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reset-msg {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.reset-msg--ok   { color: #00ff41; }
+.reset-msg--error { color: #ff003c; }

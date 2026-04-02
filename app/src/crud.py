@@ -17,5 +17,5 @@ async def get_history(db: AsyncSessionLocal, limit: int = 20):
 
 
 async def reset_mass(db: AsyncSessionLocal):
-    await db.execute(text("TRUNCATE TABLE observations"))
+    await db.execute(text("TRUNCATE TABLE observations RESTART IDENTITY CASCADE"))
     await db.commit()

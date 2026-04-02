@@ -1,28 +1,31 @@
-#We're using slim version for the best performance and light weight
-FROM python:3.11-slim
+# Stage 1
+FROM python:3.11-slim AS base
+FROM base AS builder
 
-#Setting our working directory
 WORKDIR /app
 
-#Setiing essential python environment variables for container
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDOWNWRITEBYTECODE=1
-
-#Copying the list of dependencies for pip
+#Copying only requirements - the layer will be cached till the file changes
 COPY requirements.txt .
 
-#Updating pip and installing all dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
+    pip install --no-cache-dir --default-timeout=1000 \
+    --prefix=/install \
+    -r requirements.txt
 
-#Copying app source code
+FROM base
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+COPY --from=builder /install /usr/local
+
 COPY src/ ./src/
 
-#Adding and going under different user for security
-RUN useradd -m appuser && \
-    chown -R appuser:appuser /app
+RUN useradd -m voiduser && \
+    chown -R voiduser:voiduser /app
 
-USER appuser
+USER voiduser
 
-#Executing our main command for setting our backend
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
