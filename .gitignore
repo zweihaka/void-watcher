@@ -1,3 +1,4 @@
+secrets/
 db/data
 .env
 .venv
