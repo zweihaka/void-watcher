@@ -4,8 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .database import engine, AsyncSessionLocal
 from sqlalchemy import text
 from . import crud
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 last_reset_time = 0
 COOLDOWN = 60
