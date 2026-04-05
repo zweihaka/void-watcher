@@ -47,6 +47,8 @@ jobs:
 
       - name: Deploy
         run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/void-watcher-web:latest
-          docker pull ghcr.io/${{ github.repository_owner }}/void-watcher-app:latest
+          docker pull ghcr.io/zweihaka/void-watcher-web:latest
+          docker pull ghcr.io/zweihaka/void-watcher-app:latest
+          docker stack rm void-stack || true
+          sleep 15
           docker stack deploy -c docker-stack.yml void-stack
