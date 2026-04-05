@@ -22,6 +22,7 @@ jobs:
             echo "${{ secrets.DB_PASSWORD }}" > secrets/db_password.txt
             echo "${{ secrets.DB_USER }}" > secrets/db_user.txt
             echo "${{ secrets.DB_NAME }}" > secrets/db_name.txt
+            echo "${{ secrets.GRAFANA_PASSWORD }}" > secrets/grafana_password.txt
             
       - name: Login to GHCR
         uses: docker/login-action@v3
