@@ -1,6 +1,75 @@
 services:
+
+    prometheus:
+        image: prom/prometheus:latest
+        ports:
+            - "9090:9090"
+        configs:
+            - source: prometheus.yml
+              target: /etc/prometheus/prometheus.yml
+        volumes:
+            - prometheus_data:/prometheus
+        networks:
+            - app-network
+        deploy:
+            replicas: 1
+            resources:
+                limits:
+                    memory: 256M
+
+    grafana:
+        image: grafana/grafana:latest
+        ports:
+            - "3000:3000"
+        environment:
+            GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_password
+        secrets:
+            - grafana_password
+        volumes:
+            - grafana_data:/var/lib/grafana
+        networks:
+            - app-network
+        deploy:
+            replicas: 1
+            resources:
+                limits:
+                    memory: 256M
+
+    node-exporter:
+        image: prom/node-exporter:latest
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - '--path.procfs=/host/proc'
+            - '--path.sysfs=/host/sys'
+            - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+        networks:
+            - app-network
+        deploy:
+            mode: global
+            resources:
+                limits:
+                    memory: 64M
+
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor:latest
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:ro
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        networks:
+            - app-network
+        deploy:
+            mode: global
+            resources:
+                limits:
+                    memory: 128M
+
     web:
-        image: void-watcher-web:latest
+        image: ghcr.io/zweihaka/void-watcher-web:latest
         ports:
             - "80:80"
         networks:
@@ -68,7 +137,7 @@ services:
                     memory: 256M
 
     app:
-        image: void-watcher-app:latest
+        image: ghcr.io/zweihaka/void-watcher-app:latest
         networks:
             - app-network
         environment:
@@ -101,7 +170,7 @@ services:
                     memory: 256M
 
     worker:
-        image: void-watcher-app:latest
+        image: ghcr.io/zweihaka/void-watcher-app:latest
         command: ["python", "-m", "src.worker"]
         networks:
             - app-network
@@ -137,8 +206,15 @@ networks:
 volumes:
     db_data:
         driver: local
+    prometheus_data:
+        driver: local
+    grafana_data:
+        driver: local
 
 configs:
+    prometheus.yml:
+        file: ./monitoring/prometheus.yml
+
     db_init:
         file: ./db/init.sql
 
@@ -149,3 +225,5 @@ secrets:
         file: ./secrets/db_user.txt
     db_name:
         file: ./secrets/db_name.txt
+    grafana_password:
+        file: ./secrets/grafana_password.txt
