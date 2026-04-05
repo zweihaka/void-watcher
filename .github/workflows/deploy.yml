@@ -19,28 +19,29 @@ jobs:
             echo "${{ secrets.DB_USER }}" > secrets/db_user.txt
             echo "${{ secrets.DB_NAME }}" > secrets/db_name.txt
             
-      - name: Login to Docker Hub
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+  
       - name: Build & push web
         uses: docker/build-push-action@v5
         with:
           context: ./web
           push: true
-          tags: zweihaka/void-watcher-web:latest
+          tags: ghcr.io/${{ github.repository_owner }}/void-watcher-web:latest
 
       - name: Build & push app
         uses: docker/build-push-action@v5
         with:
           context: ./app
           push: true
-          tags: zweihaka/void-watcher-app:latest
+          tags: ghcr.io/${{ github.repository_owner }}/void-watcher-app:latest
 
       - name: Deploy
         run: |
-          docker pull zweihaka/void-watcher-web:latest
-          docker pull zweihaka/void-watcher-app:latest
+          docker pull ghcr.io/${{ github.repository_owner }}/void-watcher-web:latest
+          docker pull ghcr.io/${{ github.repository_owner }}/void-watcher-app:latest
           docker stack deploy -c docker-stack.yml void-stack
