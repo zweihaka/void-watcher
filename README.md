@@ -17,21 +17,26 @@ graph TD
     WRK[Python worker: Background Task] -->|Update Telemetry| DB
     WRK -->|Simulate Load| WRK
 ```
+Stack:
+- Docker, Docker Compose, Docker Swarm (stack, scaling)
+- CI/CD: GitHub Actions (build, push, deploy)
+- Monitoring: Prometheus (Node Exporter, cAdvisor), Grafana
+- Backend: FastAPI, SQLAlchemy - currently we have ping, history(which displays all last 20 database records), and resetting database(with ids) functions.
+- Worker: Python - imitates black holes accreation and hawking radiation every 15 seconds.
+- Frontend: React, Vite
+- Database: PostgreSQL 15
+- Web: Nginx (reverse proxy)
 
-1. Frontend (Nginx + React/Vite)
-2. Backend API (Python FastAPI/SQLAlchemy) - currently we have ping, history(which displays all last 20 database records), and resetting database(with ids) functions.
-3. Worker (Python) - imitates black holes accreation and hawking radiation every 15 seconds.
-4. Database (PostgreSQL)
 
 To run that project you need to do several steps:
 ```bash
     git clone https://github.com/zweihaka/void-watcher.git
     cd void-watcher
-    docker compose up -d
+    docker stack deploy -c docker-stack.yml void-stack
 ```
 For updating do that:
 ```bash
     cd void-watcher
     git pull origin main
-    docker compose up -d --build
+    docker stack deploy -c docker-stack.yml void-stack
 ```
